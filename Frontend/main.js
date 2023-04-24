@@ -12,11 +12,9 @@ let loginBtn = document.querySelector("#login");
 let startLoginBtn = document.querySelector("#startLogin");
 let startLogoutBtn = document.querySelector("#startLogout");
 let welcomeP = document.querySelector("#welcomeUser");
-
 let main = document.querySelector("#displayBooks");
 let toRead = document.querySelector("#toRead");
 let books = document.querySelector("#books-list");
-
 let ratedBooks = document.querySelector("#ratedBooks");
 let ratedTitleBtn = document.querySelector("#ratedTitle");
 let ratedAuthorBtn = document.querySelector("#ratedAuthor");
@@ -172,8 +170,8 @@ const getBooks = async () => {
           <option value="3">3</option>
           <option value="4">4</option>
           <option value="5">5</option>  
-          <button onclick="addToRates(${book.id})">Add Rate</button>
           </select>
+          <button onclick="addToRates(${book.id})">Add Rate</button>
           <br>
           <button onclick="addToFavorite(${book.id})">Add to favorites</button>
           </div>
