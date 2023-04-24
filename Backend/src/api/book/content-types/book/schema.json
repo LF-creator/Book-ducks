@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "books",
+  "info": {
+    "singularName": "book",
+    "pluralName": "books",
+    "displayName": "Book",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Title": {
+      "type": "string"
+    },
+    "Author": {
+      "type": "string"
+    },
+    "Cover": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Pages": {
+      "type": "string"
+    },
+    "Published": {
+      "type": "string",
+      "required": false
+    },
+    "rates": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::rate.rate",
+      "mappedBy": "books"
+    },
+    "users_permissions_users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "book"
+    },
+    "Rating": {
+      "type": "integer"
+    }
+  }
+}
