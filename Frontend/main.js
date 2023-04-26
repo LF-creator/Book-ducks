@@ -148,65 +148,55 @@ const getBooks = async () => {
     }    
   };
 
+  
+
   const createBookDiv = (book) => {
     try {
       const bookDiv = document.createElement("div");
       bookDiv.classList.add("book");
-      
+  
       const coverUrl = book.attributes.Cover ? book.attributes.Cover.data.attributes.url : null; // get the cover image URL
-      
-      if (coverUrl) {
-        // display the book info and cover image
-        bookDiv.innerHTML = `
-          <h2>${book.attributes.Title}</h2>
-          <p>Author: ${book.attributes.Author}</p>
-          <img src="http://localhost:1338${coverUrl}" alt="Book cover">
-          <p>Pages: ${book.attributes.Pages}</p>
-          <p>Published: ${book.attributes.Published}</p>
-          <p>Rating: ${book.attributes.Rating}</p>
-          <select id="rating-select-${book.id}">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>  
-          </select>
-          <button onclick="addToRates(${book.id})">Add Rate</button>
-          <br>
-          <button onclick="addToFavorite(${book.id})">Add to favorites</button>
-          </div>
-  `;
-        ;
-      } else {
-        // if there's no image, display the book info as text only
-        bookDiv.innerHTML = `
-          <h2>${book.attributes.Title}</h2>
-          <p>Author: ${book.attributes.Author}</p>
-          <p>Image: ${book.attributes.Image}</p>
-          <p>Pages: ${book.attributes.Pages}</p>
-          <p>Published: ${book.attributes.Published}</p>
-          <p>Rating: ${book.attributes.Rating}</p>
-          
-        `;
-      }
-
-      // add event listeners to the star elements to rate the book
-      const stars = bookDiv.querySelectorAll(".star");
-      stars.forEach((star) => {
-        star.addEventListener("click", async () => {
-          const rating = parseInt(star.getAttribute("data-rating"));
-          const response = await rateBook(book.id, rating);
-          if (response) {
-            const rateElement = bookDiv.querySelector(`#rate-${book.id}`);
-            rateElement.innerText = `Your rating: ${rating}`;
-          }
-        });
-      });
-      
+  
+      // use ternary operator to create the book info and cover image template string
+      const bookInfoTemplate = `
+        <h2>${book.attributes.Title}</h2>
+        <p>Author: ${book.attributes.Author}</p>
+        ${coverUrl ? `<img src="http://localhost:1338${coverUrl}" alt="Book cover">` : ''}
+        <p>Pages: ${book.attributes.Pages}</p>
+        <p>Published: ${book.attributes.Published}</p>
+        <label for="rating-input-${book.id}">Rating:</label>
+        <input type="number" id="rating-input-${book.id}" min="1" max="5" value="${book.attributes.Rating}">
+        <button onclick="updateRating(${book.id})">Add Rate</button>
+        <button onclick="addToFavorite(${book.id})">Add to favorites</button>
+        <p id="rate-${book.id}">Your rating: ${book.attributes.Rating}</p>
+      `;
+  
+      bookDiv.innerHTML = bookInfoTemplate;
+  
       return bookDiv;
     } catch (error) {
       console.log(`Error creating book div: ${error}`);
       return null;
+    }
+  };
+
+  const updateRating = async (bookId) => {
+    const ratingInput = document.querySelector(`#rating-input-${bookId}`);
+    const rating = parseInt(ratingInput.value);
+  
+    try {
+      const response = await axios.put(`http://localhost:1338/api/books/${bookId}`, {
+        data: {
+          attributes: {
+            Rating: rating
+          }
+        }
+      });
+  
+      const rateElement = document.querySelector(`#rate-${bookId}`);
+      rateElement.innerText = `Your rating: ${rating}`;
+    } catch (error) {
+      console.log(`Error updating rating for book ${bookId}: ${error}`);
     }
   };
 
@@ -233,8 +223,6 @@ const getBooks = async () => {
     }
   };
   
-
-
   const addToRates = async (bookId) => {
     const ratingSelect = document.getElementById(`rating-select-${bookId}`);
     const rating = ratingSelect.value;
@@ -265,30 +253,17 @@ const getBooks = async () => {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-let bookId = e.target.id.replace("addToFav", "");
-let bookToAdd = books.find((book) => book.id === bookId);
 
-if (favoriteBooks && favoriteBooks.length > 0) {
-  // add book to favorites
-} else {
-  // initialize favorites array and add book to it
-}
-
-const favorites = []; // array to store all favorite books
-
-const addToFavorite = async (bookId) => {
+let favoriteBook = async (bookId) => {
   try {
-    const response = await axios.get(`http://localhost:1338/api/books/${bookId}`);
-    const book = response.data;
-
-    // Add book to favorites array
-    favorites.push(book);
-    
-    // Send updated favorites array to server
-    await axios.put(
-      "http://localhost:1338/api/users/me",
+    let response = await axios.put(
+      `http://localhost:1338/api/books/${bookId}`,
       {
-        favoriteBooks: favorites // Update favoriteBooks field for the logged-in user
+        data: {
+          users: {
+            connect: [sessionStorage.getItem("loginId")],
+          },
+        },
       },
       {
         headers: {
@@ -296,40 +271,38 @@ const addToFavorite = async (bookId) => {
         },
       }
     );
+    let data = response.data;
   } catch (error) {
     console.log(error);
   }
 };
 
-let favoritesList = document.querySelector("#favorites-list");
-
-
-const showFavorites = async () => {
-  let list = document.createElement("ul"); // create a new unordered list element
-  favoritesList.innerHTML = ""; // clear the old list
-  favoritesList.appendChild(list); // append the new list to the favorites container
-
-  favorites.forEach(async (bookId) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:1338/api/books/${bookId}`
-      );
-      console.log("response", response);
-      const book = response.data.data;
-      console.log("book", book);
-      const bookDiv = createBookDiv(book);
-      console.log("bookDiv", bookDiv);
-      let li = document.createElement("li"); // create a new list item element
-      li.appendChild(bookDiv); // append the book div to the list item
-      list.appendChild(li); // append the list item to the new list
-    } catch (error) {
-      console.log(`Error fetching book ${bookId}: ${error}`);
-    }
-  });
+let getFavoriteBooks = async () => {
+  try {
+    let response = await axios.get(
+      `http://localhost:1338/api/books?filter[users]=${sessionStorage.getItem(
+        "loginId"
+      )}&populate=users`
+    );
+    let favoriteBooks = response.data;
+    // Skapa en ny array med alla favoritböcker
+    let favoriteBooksByUser = {};
+    favoriteBooks.data.forEach((favoriteBook) => {
+      let userId = favoriteBook.attributes.users.data[0].id;
+      if (favoriteBooksByUser[userId]) {
+        favoriteBooksByUser[userId].push(favoriteBook);
+      } else {
+        favoriteBooksByUser[userId] = [favoriteBook];
+      }
+    });
+    return favoriteBooksByUser;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };
-document.addEventListener("DOMContentLoaded", () => {
-  showFavorites();
-});
+
+
 
 let rateBook = async (bookId, rate) => {
   try {
@@ -381,7 +354,7 @@ let rateBook = async (bookId, rate) => {
         `http://localhost:1338/api/books/${bookId}`,
         {
           data: {
-            rating: avgRating,
+            rating: rating,
           },
         },
         {
@@ -395,8 +368,3 @@ let rateBook = async (bookId, rate) => {
     console.log(error);
   }
 };
-
-
-
-
-

@@ -41,19 +41,20 @@ h3 {
 #books-container{
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  margin: 0;
+  justify-content: space-between; 
+  margin: 5%;
   padding: 0;
 }
 
 .book{
   border: 2px rgba(62, 54, 138, 0.616) solid;
   background-color: rgb(118, 132, 192);
-  width: 30%;
+  width: 20%;
   margin: 1%;
   padding: 1%;
   border-radius: 5px;
   box-shadow: 0 0 10px rgb(0, 0, 0);
+  height: 15%;
   
 }
 
@@ -384,4 +385,50 @@ h3 {
       display: block;
       border-radius: 5px;
     
+}
+
+#inputRating{
+
+  text-align: center;
+  border: 1px solid #ffffff;
+  margin-top: 10px;
+  margin: 5px;
+  padding: 5px;
+  border: #ffffff8c;
+  background-color: rgb(118, 132, 192);
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  display: block;
+  border-radius: 5px;
+
+}
+
+#inputRating:hover{
+
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+
+}
+
+#inputRating:active{
+
+  background-color: rgb(118, 132, 192);
+  color: rgb(255, 255, 255);
+
+}
+
+.inputRating{
+
+  text-align: center;
+  border: 1px solid #ffffff;
+  margin-top: 10px;
+  margin: auto;
+  padding: 5px;
+  border: #ffffff8c;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  display: block;
+  border-radius: 5px;
+
 }
