@@ -148,8 +148,6 @@ const getBooks = async () => {
     }    
   };
 
-  
-
   const createBookDiv = (book) => {
     try {
       const bookDiv = document.createElement("div");
@@ -254,6 +252,34 @@ const getBooks = async () => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+function addToFavorite(bookId) {
+  axios.put(
+    `http://localhost:1338/api/books/${bookId}`,
+    {
+      data: {
+        users: {
+          connect: [sessionStorage.getItem("loginId")],
+        },
+      },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    }
+  )
+  .then(response => {
+    console.log(response.data);
+    alert("Book added to favorites!");
+  })
+  .catch(error => {
+    console.error(error);
+    alert("Failed to add book to favorites.");
+  });
+}
+
+
+
 let favoriteBook = async (bookId) => {
   try {
     let response = await axios.put(
@@ -301,8 +327,6 @@ let getFavoriteBooks = async () => {
     return null;
   }
 };
-
-
 
 let rateBook = async (bookId, rate) => {
   try {
