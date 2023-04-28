@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body onload="renderFavoriteBooks()">
     <header id="header">
         <div id="headerContent">
             <a href="index.html">
@@ -66,10 +66,14 @@
       </header>
    
     </div>
+
     
-        <nav>
-            <ul id="favorites-list"></ul>
-        </nav>
+      <h2>Favorite Books</h2>
+      <ul id="favorite-books-list"></ul>
+    
+    
+    
+       
         
         <div id="ratedBooksButtons">
           <h2 >Rated Books</h2>

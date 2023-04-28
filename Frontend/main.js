@@ -303,30 +303,50 @@ let favoriteBook = async (bookId) => {
   }
 };
 
-let getFavoriteBooks = async () => {
+async function getFavoriteBooks(userId) {
   try {
-    let response = await axios.get(
-      `http://localhost:1338/api/books?filter[users]=${sessionStorage.getItem(
-        "loginId"
-      )}&populate=users`
-    );
-    let favoriteBooks = response.data;
-    // Skapa en ny array med alla favoritböcker
-    let favoriteBooksByUser = {};
-    favoriteBooks.data.forEach((favoriteBook) => {
-      let userId = favoriteBook.attributes.users.data[0].id;
-      if (favoriteBooksByUser[userId]) {
-        favoriteBooksByUser[userId].push(favoriteBook);
-      } else {
-        favoriteBooksByUser[userId] = [favoriteBook];
-      }
+    const response = await axios.get(`http://localhost:1338/api/users/${userId}/favorites`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
     });
-    return favoriteBooksByUser;
+    const favoriteBooks = response.data;
+    return favoriteBooks;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
+}
+
+
+async function displayFavoriteBooks() {
+  const favoriteBooks = await getFavoriteBooks(userId);
+  if (favoriteBooks) {
+    // append the favorite books to the HTML list
+  } else {
+    // handle error case
+  }
+}
+
+// call the displayFavoriteBooks function when the profile page loads
+window.onload = displayFavoriteBooks;
+
+
+
+
+let renderFavoriteBooks = async () => {
+  let favoriteBooks = await getFavoriteBooks();
+  let favoriteBooksList = document.getElementById("favorite-books-list");
+  favoriteBooksList.innerHTML = "";
+  favoriteBooks.forEach((book) => {
+    let bookItem = document.createElement("li");
+    bookItem.innerHTML = `${book.attributes.Title} by ${book.attributes.Author}`;
+    favoriteBooksList.appendChild(bookItem);
+  });
 };
+
+
+
 
 let rateBook = async (bookId, rate) => {
   try {
@@ -392,3 +412,4 @@ let rateBook = async (bookId, rate) => {
     console.log(error);
   }
 };
+
